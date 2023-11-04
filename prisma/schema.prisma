@@ -1,0 +1,61 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String         @id @default(uuid())
+  email         String         
+  first_name    String         @db.VarChar(32)
+  last_name     String         @db.VarChar(32)
+  image_url     String?
+  role          Role
+  notifications Notification[]
+  documents Document[]
+  providers Json
+  providers_list Providers[]
+  json_settings Json?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model Notification {
+  id       String @id @default(uuid())
+  user_id  String
+  user     User   @relation(fields: [user_id], references: [id])
+  text     String @db.VarChar(128)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model Document {
+  id String @id @default(uuid())
+  name String?
+  title String
+  content String
+  main_font String
+  font_size String
+  
+  contributors User[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  USER
+}
+
+enum Providers {
+  GOOGLE
+  GITHUB
+  VK
+}
